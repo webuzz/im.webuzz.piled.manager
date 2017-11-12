@@ -76,7 +76,7 @@ public class ServerManagePilet implements IPilet, IServerBinding, IPiledWrapping
 		/* Restart server!!! */
 		if (req.url.startsWith("/restart/") && (ManageConfig.serverTrustedHost == null
 				|| ManageConfig.serverTrustedHost.equals(req.remoteIP))) {
-			String retartPassword = Config.parseSecret(ManageConfig.restartPassword);
+			String retartPassword = ManageConfig.restartPassword;
 			if (retartPassword != null && retartPassword.length() > 0
 					&& req.url.startsWith("/restart/" + retartPassword)) {
 				HttpWorkerUtils.pipeOut(req, resp, "text/html", null, "ok", false);
@@ -344,7 +344,7 @@ public class ServerManagePilet implements IPilet, IServerBinding, IPiledWrapping
 	 * Decrypt and format into Basic Authentication string.
 	 */
 	private static String decryptBasicAuth(final String password) {
-		String secret = Config.parseSecret(password);
+		String secret = password;
 		if (secret != null && secret.indexOf(':') != -1) {
 			secret = Base64.byteArrayToBase64(secret.getBytes());
 		} // else original base 64 encoded secret
