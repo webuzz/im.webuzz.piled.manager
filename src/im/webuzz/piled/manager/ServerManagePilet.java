@@ -61,17 +61,17 @@ public class ServerManagePilet implements IPilet, IServerBinding, IPiledWrapping
 
 	@Override
 	public boolean service(HttpRequest req, HttpResponse resp) {
-		//*
+		/*
 		if (ManageConfig.redirectPages && req.host != null && req.host.startsWith("www.")) {
 			HttpWorkerUtils.found("http://" + req.host.substring(4) + req.url, req, resp);
 			return true;
 		}
-		//*/
 		// redirect http://hello.com./index.html to http://hello.com/index.html
 		if (ManageConfig.redirectPages && req.host != null && req.host.matches("^.*[\\\\\\.]$")) {
 			HttpWorkerUtils.redirect("http://" + req.host.substring(0, req.host.length() - 1) + req.url, req, resp);
 			return true;
 		}
+		//*/
 		
 		/* Restart server!!! */
 		if (req.url.startsWith("/restart/") && (ManageConfig.serverTrustedHost == null
@@ -196,10 +196,10 @@ public class ServerManagePilet implements IPilet, IServerBinding, IPiledWrapping
 				return true;
 			}
 			String query = null;
-			if (req.requestData != null) {
+			if (req.requestQuery != null || req.requestBody != null) {
 				try {
-					query = (req.requestData instanceof String ? (String) req.requestData
-							: new String((byte[]) req.requestData, "UTF-8"));
+					query = (req.requestQuery != null ? req.requestQuery
+							: new String((byte[]) req.requestBody, "UTF-8"));
 				} catch (UnsupportedEncodingException e1) {
 					e1.printStackTrace();
 				}
@@ -419,8 +419,8 @@ public class ServerManagePilet implements IPilet, IServerBinding, IPiledWrapping
 				builder.append(req.requestCount);
 				builder.append(" ");
 				builder.append(req.url);
-				if (req.requestData instanceof String) {
-					String more = (String) req.requestData;
+				if (req.requestQuery != null) {
+					String more = req.requestQuery;
 					if (more.indexOf("WLL") == -1) {
 						builder.append("?");
 						if (html) {
@@ -521,8 +521,8 @@ public class ServerManagePilet implements IPilet, IServerBinding, IPiledWrapping
 					builder.append(req.requestCount);
 					builder.append(" ");
 					builder.append(req.url);
-					if (req.requestData instanceof String) {
-						String more = (String) req.requestData;
+					if (req.requestQuery != null) {
+						String more = req.requestQuery;
 						if (more.indexOf("WLL") == -1) {
 							builder.append("?");
 							if (html) {
